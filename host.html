@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>主持人控制台 Host Console · 現場互動投票 Live Poll</title>
+<title>Host Console · Live Poll</title>
 <style>
 :root{--bg:#f6f7fb;--ink:#1c2233;--mut:#6b7385;--ok:#1f9d63;--err:#e11d48;--c0:#2f6fed;--c1:#f08a24;--c2:#8a93a6;--border:#dfe3ee}
 *{box-sizing:border-box}
@@ -53,26 +53,26 @@ input{width:100%;font-size:13px;padding:9px 10px;border:2px solid var(--border);
 </head>
 <body>
 <div class="topbar">
-  <h1>🎙️ 主持人控制台 <small>Host Console</small></h1>
+  <h1>🎙️ Host Console</h1>
   <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
-    <span id="conn-pill" class="pill wait"><span class="dot"></span><span id="conn-text">連線中 Connecting…</span></span>
-    <span style="font-size:13px;color:#cbd5e1">房號 Room: <span class="room-badge" id="room-display"></span></span>
-    <button class="top-btn" onclick="manualSync()">🔄 刷新同步 Sync</button>
-    <button class="top-btn" style="background:#e11d48" onclick="hardRestart()">🔁 全部重新來過 Reset All</button>
+    <span id="conn-pill" class="pill wait"><span class="dot"></span><span id="conn-text">Connecting…</span></span>
+    <span style="font-size:13px;color:#cbd5e1">Room: <span class="room-badge" id="room-display"></span></span>
+    <button class="top-btn" onclick="manualSync()">↻ Refresh</button>
+    <button class="top-btn" style="background:#e11d48" onclick="hardRestart()">⟲ Reset All</button>
   </div>
 </div>
 
 <div class="wrap">
   <div>
-    <div class="card" id="main">正在初始化連線… / Initializing connection…</div>
+    <div class="card" id="main">Initializing live connection…</div>
     <div class="card" id="detail"></div>
   </div>
   <div>
     <div class="card">
-      <div class="sub">📱 觀眾掃碼入口 <span>Audience QR Code</span></div>
+      <div class="sub">📱 Audience QR Entry</div>
       <div id="qr"></div>
-      <p class="mut" style="margin-bottom:4px">將「觀眾手機端」上傳至網站後，把網址貼在下方（請勿貼 <code>file:///</code> 本機路徑）：<br><small>Paste the public HTTPS URL of the audience page below:</small></p>
-      <input id="base-url" placeholder="https://your-site.netlify.app/vote.html" oninput="updateQR()">
+      <p class="mut" style="margin-bottom:4px">Upload the audience page to a public site, then paste the public HTTPS URL here. Do not use a local file:// URL.<br><small>Paste the public HTTPS URL of the audience page below:</small></p>
+      <input id="base-url" placeholder="https://your-site.netlify.app/index.html" oninput="updateQR()">
       <p class="mut" id="full-link" style="word-break:break-all;font-size:11px;margin-top:8px"></p>
     </div>
     <div class="card" id="ctl"></div>
@@ -86,22 +86,22 @@ const CFG = {
   options: [
     { id: "A", zh: "A", en: "Model A" },
     { id: "B", zh: "B", en: "Model B" },
-    { id: "平手", zh: "平手", en: "Tie" }
+    { id: "Tie", zh: "Tie", en: "Tie" }
   ],
   reasons: [
-    { id: "回答更完整", zh: "回答更完整", en: "More comprehensive" },
-    { id: "回答更簡潔", zh: "回答更簡潔", en: "More concise" },
-    { id: "更符合題目要求", zh: "更符合題目要求", en: "Follows instructions" },
-    { id: "格式清楚好讀", zh: "格式清楚好讀", en: "Clearer formatting" },
-    { id: "資訊更正確", zh: "資訊更正確", en: "More accurate" },
-    { id: "語氣更自然", zh: "語氣更自然", en: "More natural tone" },
-    { id: "兩個差不多", zh: "兩個差不多", en: "About the same" }
+    { id: "More comprehensive", zh: "More comprehensive", en: "More comprehensive" },
+    { id: "More concise", zh: "More concise", en: "More concise" },
+    { id: "Follows instructions better", zh: "Follows instructions better", en: "Follows instructions better" },
+    { id: "Clearer formatting", zh: "Clearer formatting", en: "Clearer formatting" },
+    { id: "More accurate info", zh: "More accurate info", en: "More accurate info" },
+    { id: "More natural tone", zh: "More natural tone", en: "More natural tone" },
+    { id: "About the same", zh: "About the same", en: "About the same" }
   ],
   questions: [
-    { id: "r1", shortZh: "第一輪", shortEn: "Round 1", zh: "第一輪：看這組回答，你覺得 A 或 B 較好？", en: "Round 1: Looking at these responses, which is better, A or B?" },
-    { id: "r2", shortZh: "第二輪", shortEn: "Round 2", zh: "第二輪：看理由叢集後，你的判斷改變了嗎？", en: "Round 2: After viewing reason clusters, has your judgment changed?" },
-    { id: "r3", shortZh: "第三輪", shortEn: "Round 3", zh: "第三輪：用 N-gram／函式篩選後，哪個模型較好？", en: "Round 3: After N-gram / function filtering, which model is better?" },
-    { id: "pred", shortZh: "預測題", shortEn: "Prediction", zh: "預測：LLM 評審會選哪一個？", en: "Prediction: Which one will the LLM Judge choose?" }
+    { id: "r1", shortZh: "Round 1", shortEn: "Round 1", zh: "Round 1: Which response is better, A or B?", en: "Round 1: Which response is better, A or B?" },
+    { id: "r2", shortZh: "Round 2", shortEn: "Round 2", zh: "Round 2: After seeing the reason clusters, has your judgment changed?", en: "Round 2: After seeing the reason clusters, has your judgment changed?" },
+    { id: "r3", shortZh: "Round 3", shortEn: "Round 3", zh: "Round 3: After N-gram / function filtering, which model is better?", en: "Round 3: After N-gram / function filtering, which model is better?" },
+    { id: "pred", shortZh: "Prediction", shortEn: "Prediction", zh: "Prediction: Which one will the LLM judge choose?", en: "Prediction: Which one will the LLM judge choose?" }
   ]
 };
 
@@ -116,7 +116,6 @@ if (!roomId) {
 localStorage.setItem("host_room_id_v2", roomId);
 document.getElementById("room-display").textContent = roomId;
 
-// 狀態與選票快取（支援本機 localStorage 雙分頁 + 雲端 MQTT 跨手機雙向即時同步）
 const STORE_KEY = "host_arena_cache_" + roomId;
 let state = { current: "r1", open: false, reveal: false, session: Date.now() };
 let votesMap = { r1: {}, r2: {}, r3: {}, pred: {} };
@@ -131,7 +130,6 @@ function saveLocal() {
   localStorage.setItem(STORE_KEY, JSON.stringify({ state, votesMap }));
 }
 
-// 連接高可靠度公共 MQTT WSS 伺服器（HiveMQ + EMQX 雙備援）
 const TOPIC_STATE = `livevote2026/${roomId}/state`;
 const TOPIC_VOTE  = `livevote2026/${roomId}/vote`;
 const TOPIC_PING  = `livevote2026/${roomId}/ping`;
@@ -149,23 +147,22 @@ function setConn(status, text) {
 }
 
 client.on("connect", () => {
-  setConn("ok", "即時連線中 Live");
+  setConn("ok", "Live");
   client.subscribe([TOPIC_VOTE, TOPIC_PING], { qos: 1 });
-  publishState(); // 上線立即廣播並保留最新狀態 (Retained)
+  publishState();
 });
 
-client.on("reconnect", () => setConn("wait", "重新連線中 Reconnecting…"));
-client.on("offline", () => setConn("err", "離線 Offline"));
-client.on("error", () => setConn("err", "連線異常 Error"));
+client.on("reconnect", () => setConn("wait", "Reconnecting…"));
+client.on("offline", () => setConn("err", "Offline"));
+client.on("error", () => setConn("err", "Connection Error"));
 
 client.on("message", (topic, payload) => {
   try {
     const data = JSON.parse(payload.toString());
     if (topic === TOPIC_PING) {
-      // 有新觀眾連入詢問目前狀態，立即補發一次
       publishState();
     } else if (topic === TOPIC_VOTE && data && data.qid && data.cid) {
-      if (data.session && data.session !== state.session) return; // 忽略舊場次的過期票
+      if (data.session && data.session !== state.session) return;
       votesMap[data.qid] = votesMap[data.qid] || {};
       votesMap[data.qid][data.cid] = {
         choice: data.choice,
@@ -182,19 +179,16 @@ client.on("message", (topic, payload) => {
 function publishState() {
   saveLocal();
   if (client && client.connected) {
-    // retain: true 確保任何新掃碼進入的手機都能在 0.1 秒內收到最新題目與狀態
     client.publish(TOPIC_STATE, JSON.stringify(state), { qos: 1, retain: true });
   }
 }
 
-// 定期心跳廣播，確保所有觀眾手機絕對不會漏接狀態
 setInterval(() => {
   if (client && client.connected) {
     client.publish(TOPIC_STATE, JSON.stringify(state), { qos: 0, retain: true });
   }
 }, 4000);
 
-// 監聽同瀏覽器分頁同步（方便單機測試）
 window.addEventListener("storage", e => {
   if (e.key === STORE_KEY && e.newValue) {
     try {
@@ -213,7 +207,7 @@ function act(action, qid) {
   else if (action === "hide") { state.reveal = false; }
   else if (action === "reset") {
     votesMap[state.current] = {};
-    state.session = Date.now(); // 更新場次戳記，讓觀眾端自動重置該題作答狀態
+    state.session = Date.now();
   }
   publishState();
   render();
@@ -224,12 +218,12 @@ function manualSync() {
   render();
   const btn = event.currentTarget;
   const orig = btn.textContent;
-  btn.textContent = "✓ 已同步 Synced";
+  btn.textContent = "✓ Synced";
   setTimeout(() => btn.textContent = orig, 1000);
 }
 
 function hardRestart() {
-  if (!confirm("確定要「全部重新來過」嗎？這將清空所有四輪票數並重新開始！\nReset ALL rounds and start fresh?")) return;
+  if (!confirm("Reset all rounds and start fresh?")) return;
   votesMap = { r1: {}, r2: {}, r3: {}, pred: {} };
   state = { current: "r1", open: false, reveal: false, session: Date.now() };
   publishState();
@@ -243,12 +237,12 @@ function updateQR() {
   const qrBox = document.getElementById("qr");
   const linkBox = document.getElementById("full-link");
   if (!base) {
-    qrBox.innerHTML = `<p class="mut" style="text-align:center">請貼上公開網址<br><small>Paste URL to generate QR</small></p>`;
+    qrBox.innerHTML = `<p class="mut" style="text-align:center">Paste a public URL<br><small>Paste URL to generate QR</small></p>`;
     linkBox.textContent = "";
     return;
   }
   if (base.startsWith("file://")) {
-    qrBox.innerHTML = `<p style="color:var(--err);font-size:13px;text-align:center;font-weight:700">⚠️ 手機無法開啟 file:// 本機檔案<br>請先上傳至 Netlify / GitHub Pages 取得 https:// 網址</p>`;
+    qrBox.innerHTML = `<p style="color:var(--err);font-size:13px;text-align:center;font-weight:700">⚠️ file:// URLs do not work on phones.<br>Please upload to GitHub Pages or Netlify first.</p>`;
     linkBox.textContent = "";
     return;
   }
@@ -258,7 +252,7 @@ function updateQR() {
   qr.addData(fullUrl);
   qr.make();
   qrBox.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
-  linkBox.textContent = "觀眾連結 Audience URL: " + fullUrl;
+  linkBox.textContent = "Audience URL: " + fullUrl;
 }
 
 const savedUrl = localStorage.getItem("voter_base_url_v2") || "";
@@ -283,10 +277,10 @@ function render() {
   const max = Math.max(1, total);
 
   const stText = state.open
-    ? "投票進行中 · Voting Open"
+    ? "Voting Open"
     : state.reveal
-      ? "結果已公布 · Results Revealed"
-      : "已暫停 · Paused";
+      ? "Results Revealed"
+      : "Paused";
 
   document.getElementById("main").innerHTML =
     `<span class="status ${state.open ? "open" : ""}">${stText}</span>` +
@@ -296,13 +290,13 @@ function render() {
           <div class="row">
             <div class="lab">${esc(o.zh)}<small>${esc(o.en)}</small></div>
             <div class="track"><div class="fill" style="width:${counts[o.id]/max*100}%;background:${cols[i%3]}"></div></div>
-            <div class="num">${counts[o.id]} 票<small>votes</small></div>
-          </div>`).join("") + `<p class="mut">總計投票人數 / Total Voters: <b>${total}</b></p>`
-      : `<div style="font-size:60px;font-weight:800;margin:10px 0">${total}<span style="font-size:20px;font-weight:400;color:var(--mut)"> 人已投票 / votes received</span></div><p class="mut">點擊「公布結果」才會將長條圖與統計顯示於螢幕（觀眾端目前無法看見票數）。<br><small>Click "Reveal Results" to display the chart. Audience cannot see counts yet.</small></p>`);
+            <div class="num">${counts[o.id]}<small>votes</small></div>
+          </div>`).join("") + `<p class="mut">Total voters: <b>${total}</b></p>`
+      : `<div style="font-size:60px;font-weight:800;margin:10px 0">${total}<span style="font-size:20px;font-weight:400;color:var(--mut)"> votes received</span></div><p class="mut">Click "Reveal Results" to display the chart on the screen. Audience members cannot see the counts yet.<br><small>Audience cannot view the results until you reveal them.</small></p>`);
 
   let d = "";
   if (state.reveal) {
-    d += `<div class="sub">各選項理由統計 <span>Reason Breakdown</span></div>` + CFG.options.map(o => {
+    d += `<div class="sub">Reason Summary</div>` + CFG.options.map(o => {
       const e = Object.entries(reasons[o.id] || {});
       return e.length ? `<p style="margin:8px 0"><b>${esc(o.zh)} (${esc(o.en)})</b>　` + e.map(([k, val]) => {
         const rObj = CFG.reasons.find(item => item.id === k);
@@ -310,21 +304,21 @@ function render() {
         return `<span class="tag">${esc(label)} × ${val}</span>`;
       }).join("") + `</p>` : "";
     }).join("");
-    d += `<div class="sub" style="margin-top:18px">觀眾留言 <span>Audience Comments</span></div>` + (texts.length ? texts.slice(-60).map(t => `<div class="txt"><b>${esc(t.choice)}</b>${esc(t.text)}</div>`).join("") : `<p class="mut">尚無留言 / No comments yet</p>`);
+    d += `<div class="sub" style="margin-top:18px">Audience Comments</div>` + (texts.length ? texts.slice(-60).map(t => `<div class="txt"><b>${esc(t.choice)}</b>${esc(t.text)}</div>`).join("") : `<p class="mut">No comments yet.</p>`);
   } else {
-    d = `<p class="mut">理由統計與觀眾留言將在點擊「公布結果」後自動顯示。<br><small>Reasons and comments will appear automatically once results are revealed.</small></p>`;
+    d = `<p class="mut">Reason breakdown and comments will appear automatically after you reveal the results.</p>`;
   }
   document.getElementById("detail").innerHTML = d;
 
   document.getElementById("ctl").innerHTML =
-    `<div class="sub">1. 選擇題目 <span>Select Round</span></div><div class="ctl-grid">` +
+    `<div class="sub">1. Select Round</div><div class="ctl-grid">` +
     CFG.questions.map(item => `<button class="alt ${item.id === state.current ? "cur" : ""}" onclick="act('select','${item.id}')">${esc(item.shortZh)}<small>${esc(item.shortEn)}</small></button>`).join("") +
-    `</div><div class="sub" style="margin-top:16px">2. 流程控制 <span>Host Controls</span></div><div class="ctl-grid">` +
-    `<button onclick="act('open')" ${state.open ? "disabled" : ""}>開放投票<small>Open Voting</small></button>` +
-    `<button style="background:#2f6fed" onclick="act('reveal')">公布結果<small>Reveal Results</small></button>` +
-    `<button class="alt" onclick="act('close')">截止投票<small>Close Voting</small></button>` +
-    `<button class="alt" onclick="act('hide')">隱藏結果<small>Hide Results</small></button>` +
-    `<button class="alt danger" style="grid-column:span 2" onclick="if(confirm('確定清空本題所有票數？ / Reset all votes for this round?'))act('reset')">清空本題票數<small>Reset Current Round</small></button></div>`;
+    `</div><div class="sub" style="margin-top:16px">2. Host Controls</div><div class="ctl-grid">` +
+    `<button onclick="act('open')" ${state.open ? "disabled" : ""}>Open Voting<small>Open Voting</small></button>` +
+    `<button style="background:#2f6fed" onclick="act('reveal')">Reveal Results<small>Reveal Results</small></button>` +
+    `<button class="alt" onclick="act('close')">Close Voting<small>Close Voting</small></button>` +
+    `<button class="alt" onclick="act('hide')">Hide Results<small>Hide Results</small></button>` +
+    `<button class="alt danger" style="grid-column:span 2" onclick="if(confirm('Reset all votes for this round?'))act('reset')">Reset Current Round<small>Reset Current Round</small></button></div>`;
 }
 
 render();
